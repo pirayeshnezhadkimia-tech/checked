@@ -1,0 +1,43 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title><%= title %></title>
+</head>
+<body>
+    <h1><%= name %></h1>
+    <h2><%= subtitle %></h2>
+
+
+    <ul>
+    <% data.todos.forEach(function(todo) { %>
+        <li class="box <%= todo.isChecked ? 'checked' : '' %>">
+            <label>
+                <%= todo.name %>
+                <input type="checkbox" data-id="<%= todo.id %>" name="isChecked" <%= todo.isChecked ? 'checked' : '' %>>
+            </label>
+            <button type="button" >Send</button>
+        </li>
+    <% }); %>
+    </ul>
+
+    <script>
+        document.querySelectorAll('li input').forEach((item)=>{
+            item.addEventListener('click',()=>{
+                console.log(item.dataset.id,item.checked);
+                fetch('/todos',{
+                    method:'POST',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    },
+                    body:JSON.stringify({id:item.dataset.id,checked: item.checked})
+                }).then((res)=>{
+                    console.log(res);
+                })
+            })
+        })
+    </script>
+
+</body>
+</html>
