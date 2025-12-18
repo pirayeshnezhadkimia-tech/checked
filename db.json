@@ -1,5 +1,1 @@
-{
-    "todos":[{"id":1,"name":"Nodejs" ,"isChecked": false}],
-    "doing": [],
-    "done" : []
-}
+{"todos":[{"id":1,"name":"kimia","isChecked":true},{"id":2,"name":"kimia 2","isChecked":true}],"doing":[],"done":[]}

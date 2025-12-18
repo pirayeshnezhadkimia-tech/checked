@@ -1,50 +1,58 @@
 
 import express from 'express';
-import bodyParser from 'body-parser';
-const app = express();
+import fs from 'fs';
 
+const app = express();
 const port = 8080;
 
-
 app.set('view engine', 'ejs');
-// app.use(bodyParser.urlencoded({ extended: true }));
-// app.use(bodyParser.json());
-
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 
-try {
-
-
-    const data = {
-            "todos":[{"id":1,"name":"kimia" ,"isChecked":false },{"id":2,"name":"kimia 2" ,"isChecked":false }],
-            "doing": [],
-            "done" : []
-        }
-    
-    app.get('/', (req, res) => {
-        
-        var title = "Express Test Title";
-        var name = "Kimia Pirayesh Nezhad 22";
-        var subtitle = "Amoot Soft";
-
-        if(req.query.islost){
-            data.todos[0].isChecked=true;
-        }
-
-        res.render('Main', { title, name, subtitle,data });
-    })
-
-    app.post('/todos', (req, res) => {
-        // console.log(req.headers['content-type']);
-        // console.log(req.body);
-
-        res.json({ok:true});
-    })
-} catch (error) {
-
+function readData() {
+  return JSON.parse(fs.readFileSync("db.json", "utf-8"));
 }
 
+function writeData(data) {
+  fs.writeFileSync("db.json", JSON.stringify(data));
+}
+
+app.get('/', (req, res) => {
+  const data = readData();
+
+  res.render('Main', {
+    title: "Express Test Title",
+    name: "Kimia Pirayesh Nezhad 22",
+    subtitle: "Amoot Soft",
+    data
+  });
+});
+
+app.get('/todos', (req, res) => {
+  const data = readData();
+  res.json(data.todos);
+});
+
+
+app.patch('/todos/:id/:checked', (req, res) => {
+  const data = readData();
+  const id = Number(req.params.id);
+   const checked = req.params.checked;
+
+  const todo = data.todos.find(t => t.id === id);
+  if (!todo) {
+    return res.status(404).json({ error: "Todo not found" });
+  }
+
+  let checkedFormat = checked === 'true';
+  todo.isChecked = checkedFormat;
+
+  console.log(todo,checkedFormat,checked);
+  writeData(data);
+
+  res.json({ ok: true });
+});
+
 app.listen(port, () => {
-    console.log('App Is Running on ', port);
-})
+  console.log('App Is Running on', port);
+});
